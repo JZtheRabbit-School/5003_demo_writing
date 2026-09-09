@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Margin — Editorial workspace</title>
+  <style>
+    :root { --ink:#20201e; --muted:#77756f; --paper:#fffdf8; --canvas:#f3f0e9; --line:#e6e0d7; --accent:#d95f3a; --mark:#fce5a4; --lav:#e7def9; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--canvas); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, textarea { font:inherit; }
+    .role-gate { position:fixed; inset:0; z-index:50; padding:26px; display:grid; place-items:center; background:linear-gradient(135deg, #f4efe7 0%, #ebe5db 100%); }
+    .role-gate.hidden { display:none; }
+    .role-panel { width:min(800px, 100%); background:var(--paper); border:1px solid var(--line); box-shadow:0 24px 80px rgba(49,38,20,.14); padding:clamp(28px, 6vw, 62px); }
+    .role-panel h1 { max-width:580px; }
+    .role-panel > p { color:var(--muted); max-width:550px; line-height:1.55; margin:15px 0 31px; }
+    .role-options { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .role-choice { text-align:left; cursor:pointer; padding:25px; border:1px solid var(--line); background:#fffefa; transition:.18s ease; }
+    .role-choice:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 20px rgba(49,38,20,.08); }
+    .role-icon { color:var(--accent); font:30px Georgia,serif; display:block; margin-bottom:15px; }
+    .role-choice strong { display:block; font:600 23px Georgia,serif; margin-bottom:7px; }
+    .role-choice span { color:var(--muted); font-size:14px; line-height:1.45; }
+    .role-privacy { margin-top:23px; color:var(--muted); font-size:12px; }
+    .topbar { height:68px; padding:0 4vw; background:rgba(255,253,248,.92); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; backdrop-filter:blur(12px); }
+    .brand { display:flex; align-items:center; gap:11px; font-family:Georgia, serif; font-size:24px; font-weight:bold; letter-spacing:-.8px; }
+    .brand-mark { width:26px; height:26px; border-radius:8px 8px 8px 2px; background:var(--accent); display:inline-block; }
+    .status { color:var(--muted); font-size:13px; display:flex; gap:8px; align-items:center; }
+    .library-button { border:1px solid var(--line); background:transparent; border-radius:4px; padding:7px 10px; cursor:pointer; color:var(--ink); font-size:12px; }
+    .bar-actions { display:flex; align-items:center; gap:16px; }
+    .switch-role { display:none; border:0; background:transparent; color:var(--muted); cursor:pointer; font-size:12px; text-decoration:underline; text-underline-offset:3px; }
+    .switch-role.visible { display:block; }
+    .dot { width:7px; height:7px; border-radius:50%; background:#71a65b; }
+    .workspace { max-width:1440px; margin:0 auto; padding:42px 4vw 80px; display:grid; grid-template-columns:minmax(0, 1fr) 360px; gap:42px; }
+    .document { background:var(--paper); border:1px solid var(--line); box-shadow:0 15px 35px rgba(49,38,20,.05); padding:clamp(30px, 6vw, 82px); min-height:760px; }
+    .eyebrow { color:var(--accent); font-size:12px; font-weight:750; letter-spacing:.11em; text-transform:uppercase; margin-bottom:16px; }
+    h1 { font:500 clamp(34px, 5vw, 58px)/1.04 Georgia, serif; letter-spacing:-2px; margin:0 0 14px; }
+    .byline { color:var(--muted); font-size:15px; padding-bottom:35px; border-bottom:1px solid var(--line); }
+    .editor-note { margin:30px 0; padding:15px 18px; background:#f8f4ed; border-left:3px solid var(--accent); color:#5d554a; font-size:14px; line-height:1.55; }
+    .article { max-width:690px; font:20px/1.78 Georgia, serif; }
+    .article p { margin:0 0 1.35em; }
+    .article.file-preview { max-width:none; min-height:560px; }
+    .pdf-preview { width:100%; height:650px; border:1px solid var(--line); background:#f7f5f0; }
+    .file-notice { max-width:690px; padding:20px; background:#fff3e9; border-left:3px solid var(--accent); color:#654839; font:15px/1.55 Inter, sans-serif; }
+    mark.comment-highlight { color:inherit; background:linear-gradient(180deg, transparent 32%, var(--mark) 32%); cursor:pointer; padding:0 1px; border-radius:2px; }
+    mark.comment-highlight.active { background:var(--lav); outline:2px solid #a58ad4; }
+    .selection-popover { position:fixed; display:none; z-index:20; padding:6px; background:#292824; color:white; border-radius:9px; box-shadow:0 8px 20px rgba(0,0,0,.2); }
+    .selection-popover button { border:0; background:transparent; color:white; padding:6px 10px; cursor:pointer; font-weight:650; font-size:13px; }
+    aside { align-self:start; position:sticky; top:92px; }
+    .comments-head { display:flex; justify-content:space-between; align-items:baseline; margin:4px 0 16px; }
+    .comments-head h2 { font:600 21px Georgia, serif; margin:0; }
+    .count { color:var(--muted); font-size:13px; }
+    .empty { border:1px dashed #cec7bb; padding:28px 20px; color:var(--muted); text-align:center; font-size:14px; line-height:1.5; }
+    .comment-card { background:var(--paper); border:1px solid var(--line); border-radius:5px; padding:17px; margin-bottom:11px; box-shadow:0 4px 13px rgba(49,38,20,.035); }
+    .quote { border-left:2px solid var(--accent); color:#5b554d; font:italic 14px/1.4 Georgia, serif; margin-bottom:12px; padding-left:10px; }
+    .comment-meta { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:10px; font-weight:750; margin-bottom:7px; }
+    .comment-text { font-size:14px; line-height:1.5; }
+    .reply-box { margin-top:9px; display:flex; gap:7px; }
+    .reply-box input { min-width:0; width:100%; border:1px solid var(--line); border-radius:4px; padding:8px; background:#fff; font-size:12px; }
+    .reply-box button, .submit, .save { border:0; cursor:pointer; border-radius:4px; background:var(--ink); color:white; padding:8px 11px; font-size:12px; font-weight:650; }
+    .general { margin-top:54px; padding-top:30px; border-top:1px solid var(--line); }
+    .general h2 { font:500 28px Georgia, serif; margin:0 0 7px; }
+    .general p { color:var(--muted); margin:0 0 15px; font-size:14px; }
+    textarea { width:100%; min-height:116px; resize:vertical; padding:13px; border:1px solid #cfc7bb; border-radius:4px; background:#fff; color:var(--ink); line-height:1.5; }
+    textarea:focus { outline:2px solid #f1b6a5; border-color:var(--accent); }
+    .general-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+    .saved { font-size:12px; color:#5f8d4e; opacity:0; transition:opacity .2s; }
+    .saved.show { opacity:1; }
+    dialog { width:min(460px, calc(100% - 32px)); border:0; border-radius:10px; padding:0; box-shadow:0 18px 60px rgba(0,0,0,.22); }
+    dialog::backdrop { background:rgba(25,22,18,.38); }
+    .dialog-content { padding:25px; }
+    .dialog-content h3 { font:500 26px Georgia, serif; margin:0 0 9px; }
+    .selected-text { background:#fff3cf; border-radius:4px; padding:9px 11px; font:italic 14px/1.4 Georgia, serif; margin:14px 0; }
+    .dialog-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:14px; }
+    .cancel { background:transparent; color:var(--muted); border:0; cursor:pointer; padding:8px; }
+    .library-dialog { width:min(720px, calc(100% - 32px)); }
+    .library-dialog .dialog-content { padding:32px; }
+    .library-top { display:flex; justify-content:space-between; align-items:start; gap:20px; }
+    .library-top p { margin:5px 0 0; color:var(--muted); font-size:14px; }
+    .upload-zone { border:1.5px dashed #c9bfb2; padding:22px; text-align:center; margin:22px 0; background:#fffefa; }
+    .upload-zone label { cursor:pointer; color:var(--accent); font-weight:700; font-size:14px; }
+    .upload-zone small { display:block; color:var(--muted); margin-top:7px; }
+    .file-list { display:grid; gap:8px; max-height:300px; overflow:auto; }
+    .file-row { display:flex; align-items:center; gap:12px; padding:13px; border:1px solid var(--line); background:#fff; }
+    .file-row input { accent-color:var(--accent); width:16px; height:16px; }
+    .file-symbol { width:30px; height:35px; display:grid; place-items:center; border-radius:3px; background:#fce8e1; color:var(--accent); font-size:10px; font-weight:800; }
+    .file-name { flex:1; font-size:14px; font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .file-meta { color:var(--muted); font-size:12px; }
+    .file-empty { color:var(--muted); padding:20px 0; font-size:14px; }
+    .role-view { display:none; max-width:1050px; margin:0 auto; padding:70px 4vw; }
+    .role-view.active { display:block; }
+    .role-view h1 { max-width:650px; }
+    .role-view .intro { color:var(--muted); max-width:610px; line-height:1.6; margin:13px 0 32px; }
+    .dash-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:20px; }
+    .dash-card { background:var(--paper); border:1px solid var(--line); padding:27px; min-height:210px; }
+    .dash-card h2 { font:500 27px Georgia,serif; margin:0 0 9px; }
+    .dash-card p { color:var(--muted); font-size:14px; line-height:1.5; margin:0 0 18px; }
+    .draft-cards { display:grid; gap:9px; }
+    .draft-card { display:flex; align-items:center; gap:11px; padding:13px; background:#fff; border:1px solid var(--line); }
+    .draft-card button { border:0; background:transparent; color:var(--accent); font-size:12px; font-weight:750; cursor:pointer; }
+    .primary-action { border:0; border-radius:4px; background:var(--ink); color:white; padding:10px 14px; font-weight:700; cursor:pointer; font-size:13px; }
+    #reviewWorkspace { display:none; }
+    #reviewWorkspace.active { display:grid; }
+    @media (max-width: 900px) { .workspace { grid-template-columns:1fr; } aside { position:static; order:-1; } .document { min-height:auto; } }
+    @media (max-width: 560px) { .role-options { grid-template-columns:1fr; } .topbar { padding:0 20px; } .status { display:none; } }
+  </style>
+</head>
+<body>
+  <section class="role-gate" id="roleGate">
+    <div class="role-panel"><div class="eyebrow">Welcome to Margin</div><h1>Start in the right seat.</h1><p>Choose your role to enter a private, local workspace for thoughtful editorial collaboration.</p><div class="role-options"><button class="role-choice" data-role="writer"><span class="role-icon">✦</span><strong>I'm a writer</strong><span>Upload a PDF or DOCX draft and receive focused editorial feedback.</span></button><button class="role-choice" data-role="editor"><span class="role-icon">⌁</span><strong>I'm an editor</strong><span>Access submitted drafts, choose one, and begin your review.</span></button></div><div class="role-privacy">Files remain in this browser workspace only. No external service is used.</div></div>
+  </section>
+  <header class="topbar"><div class="brand"><span class="brand-mark"></span>Margin</div><div class="bar-actions"><button class="switch-role" id="switchRole">Change role</button><button class="library-button" id="openLibrary">Draft library</button><div class="status"><span class="dot"></span><span id="statusText">Choose a role to begin</span></div></div></header>
+  <section class="role-view" id="writerView"><div class="eyebrow">Writer space</div><h1>Your drafts, in one quiet place.</h1><p class="intro">Add PDF or DOCX files, then return here any time to see the drafts you have submitted for editorial review.</p><div class="dash-grid"><div class="dash-card"><h2>My drafts</h2><div class="draft-cards" id="writerDrafts"></div></div><div class="dash-card"><h2>Submit a draft</h2><p>Upload one or more PDF or DOCX files. They are kept locally in this browser workspace.</p><button class="primary-action" id="writerUpload">Upload drafts</button></div></div></section>
+  <section class="role-view" id="editorHome"><div class="eyebrow">Editor space</div><h1>Find the next draft worth shaping.</h1><p class="intro">Browse all writer submissions, choose one draft, and open it to begin leaving inline notes.</p><div class="dash-grid"><div class="dash-card"><h2>Submission library</h2><p id="editorDraftCount">Loading available drafts…</p><button class="primary-action" id="editorBrowse">Browse draft library</button></div><div class="dash-card"><h2>Selected draft</h2><p id="queueSummary">No draft selected yet.</p><button class="library-button" id="openQueue">Open selected draft</button></div></div></section>
+  <main class="workspace" id="reviewWorkspace">
+    <section class="document">
+      <div class="eyebrow">Draft · Personal essay</div>
+      <h1 id="draftTitle">The shape of a quiet morning</h1>
+      <div class="byline">by Eliana Brooks · Submitted today</div>
+      <div class="editor-note">Editor mode is on. Select any passage to leave a specific note, or add your overall feedback at the end.</div>
+      <article class="article" id="article">
+        <p>Before the city has made up its mind about the day, there is a small interval of mercy. The apartment is still, except for the radiator clicking awake and the kettle beginning its slow argument with the stove.</p>
+        <p>I have come to trust this hour more than any other. It asks nothing of me but attention: the blue cast of early light on the counter, the neighbor's dog shaking sleep from its collar, the one clean page waiting beside my cup.</p>
+        <p>My grandmother called this “the borrowed time.” She rose before everyone else to sit at her kitchen table, hands wrapped around a mug, looking out at the yard. I never asked what she was thinking. Now I suspect that was the point.</p>
+        <p>Later, messages arrive and the day becomes a set of doors opening at once. But for a few minutes, the world is only a room, a window, and the soft work of beginning.</p>
+      </article>
+      <section class="general">
+        <h2>General feedback</h2>
+        <p>Share overall thoughts about the piece: its structure, voice, or next steps.</p>
+        <textarea id="generalFeedback" placeholder="Write a general comment…"></textarea>
+        <div class="general-actions"><span class="saved" id="savedMessage">General comment saved</span><button class="save" id="saveGeneral">Save general comment</button></div>
+      </section>
+    </section>
+    <aside>
+      <div class="comments-head"><h2>Comments</h2><span class="count" id="count">0 notes</span></div>
+      <div id="comments"><div class="empty" id="empty">Select a passage in the draft to start the conversation.</div></div>
+    </aside>
+  </main>
+  <div class="selection-popover" id="popover"><button id="commentSelection">Add comment</button></div>
+  <dialog id="commentDialog"><div class="dialog-content"><h3>Leave a note</h3><div class="selected-text" id="selectedText"></div><textarea id="commentInput" placeholder="What would you like the writer to consider?"></textarea><div class="dialog-actions"><button class="cancel" id="cancel">Cancel</button><button class="submit" id="submit">Add comment</button></div></div></dialog>
+  <dialog class="library-dialog" id="libraryDialog"><div class="dialog-content"><div class="library-top"><div><h3 id="libraryTitle">Your draft library</h3><p id="libraryHelp"></p></div><button class="cancel" id="closeLibrary">Close</button></div><div class="upload-zone" id="uploadZone"><label for="fileUpload">Choose draft files</label><input id="fileUpload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden><small>PDF or DOCX · stored only in this browser workspace</small></div><div class="file-list" id="fileList"></div><div class="dialog-actions"><button class="submit" id="openSelected">Open selected drafts</button></div></div></dialog>
+  <script src="pdf.min.js"></script>
+  <script src="tesseract.min.js"></script>
+  <script>
+    const article = document.querySelector('#article'), popover = document.querySelector('#popover'), dialog = document.querySelector('#commentDialog');
+    const selectedText = document.querySelector('#selectedText'), input = document.querySelector('#commentInput'), comments = document.querySelector('#comments'), count = document.querySelector('#count');
+    let savedRange = null, noteNumber = 0;
+    const escapeHTML = value => value.replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[char]));
+    document.addEventListener('selectionchange', () => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !article.contains(sel.anchorNode) || !article.contains(sel.focusNode)) return popover.style.display = 'none';
+      const range = sel.getRangeAt(0); if (!range.toString().trim()) return;
+      savedRange = range.cloneRange(); const rect = range.getBoundingClientRect();
+      popover.style.display = 'block'; popover.style.left = `${Math.max(8, rect.left + rect.width / 2 - 58)}px`; popover.style.top = `${rect.top - 43}px`;
+    });
+    document.querySelector('#commentSelection').onclick = () => { if (!savedRange) return; selectedText.textContent = `“${savedRange.toString().trim()}”`; input.value = ''; popover.style.display = 'none'; dialog.showModal(); input.focus(); };
+    document.querySelector('#cancel').onclick = () => { dialog.close(); window.getSelection().removeAllRanges(); };
+    document.querySelector('#submit').onclick = () => {
+      const text = input.value.trim(); if (!text || !savedRange) return input.focus();
+      const marker = document.createElement('mark'); marker.className = 'comment-highlight'; marker.dataset.note = ++noteNumber;
+      try { savedRange.surroundContents(marker); } catch { const fragment = savedRange.extractContents(); marker.append(fragment); savedRange.insertNode(marker); }
+      marker.onclick = () => { document.querySelectorAll('mark').forEach(m => m.classList.remove('active')); marker.classList.add('active'); document.querySelector(`[data-card="${marker.dataset.note}"]`)?.scrollIntoView({behavior:'smooth', block:'center'}); };
+      document.querySelector('#empty')?.remove();
+      const card = document.createElement('div'); card.className = 'comment-card'; card.dataset.card = noteNumber;
+      card.innerHTML = `<div class="quote">“${escapeHTML(marker.textContent)}”</div><div class="comment-meta">Editor · just now</div><div class="comment-text">${escapeHTML(text)}</div><div class="reply-box"><input aria-label="Reply" placeholder="Reply to this note"><button>Reply</button></div>`;
+      card.querySelector('button').onclick = e => { const field = card.querySelector('input'); if (field.value.trim()) { e.target.textContent = 'Sent'; field.disabled = true; e.target.disabled = true; } };
+      comments.prepend(card); count.textContent = `${noteNumber} ${noteNumber === 1 ? 'note' : 'notes'}`;
+      dialog.close(); window.getSelection().removeAllRanges(); savedRange = null;
+    };
+    document.querySelector('#saveGeneral').onclick = () => { const msg = document.querySelector('#savedMessage'); if (document.querySelector('#generalFeedback').value.trim()) { msg.classList.add('show'); setTimeout(() => msg.classList.remove('show'), 2200); } };
+
+    // Local-only draft library. Files are represented in this browser workspace; no network request is made.
+    const roleGate = document.querySelector('#roleGate'), library = document.querySelector('#libraryDialog');
+    const fileList = document.querySelector('#fileList'), upload = document.querySelector('#fileUpload');
+    const writerView = document.querySelector('#writerView'), editorHome = document.querySelector('#editorHome'), review = document.querySelector('#reviewWorkspace');
+    let role = '', editingQueue = [], drafts = JSON.parse(localStorage.getItem('margin-drafts') || '[]');
+    const sampleArticle = article.innerHTML;
+    const dbName = 'margin-file-store', storeName = 'draft-files';
+    const openDB = () => new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore(storeName);
+      request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+    });
+    const saveFile = async (id, file) => { const db = await openDB(); return new Promise((resolve, reject) => { const tx = db.transaction(storeName, 'readwrite'); tx.objectStore(storeName).put(file, id); tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); }); };
+    const getFile = async id => { const db = await openDB(); return new Promise((resolve, reject) => { const request = db.transaction(storeName).objectStore(storeName).get(id); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); };
+    const removeFile = async id => { const db = await openDB(); return new Promise((resolve, reject) => { const tx = db.transaction(storeName, 'readwrite'); tx.objectStore(storeName).delete(id); tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); }); };
+    const decodeEntities = text => { const node = document.createElement('textarea'); node.innerHTML = text; return node.value; };
+    const readDocx = async file => {
+      const data = new Uint8Array(await file.arrayBuffer()); let end = -1;
+      for (let i = data.length - 22; i >= Math.max(0, data.length - 65557); i--) if (new DataView(data.buffer).getUint32(i, true) === 0x06054b50) { end = i; break; }
+      if (end < 0) throw new Error('The DOCX archive could not be read.');
+      const view = new DataView(data.buffer), directory = view.getUint32(end + 16, true), count = view.getUint16(end + 10, true); let pointer = directory;
+      for (let item = 0; item < count; item++) {
+        if (view.getUint32(pointer, true) !== 0x02014b50) break;
+        const compressed = view.getUint32(pointer + 20, true), nameLength = view.getUint16(pointer + 28, true), extraLength = view.getUint16(pointer + 30, true), commentLength = view.getUint16(pointer + 32, true), local = view.getUint32(pointer + 42, true);
+        const name = new TextDecoder().decode(data.slice(pointer + 46, pointer + 46 + nameLength));
+        if (name === 'word/document.xml') {
+          const method = view.getUint16(pointer + 10, true), localName = view.getUint16(local + 26, true), localExtra = view.getUint16(local + 28, true), bytes = data.slice(local + 30 + localName + localExtra, local + 30 + localName + localExtra + compressed);
+          const xmlBytes = method === 8 ? new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer()) : bytes;
+          const xml = new TextDecoder().decode(xmlBytes);
+          const paragraphs = xml.match(/<w:p\b[^>]*>[\s\S]*?<\/w:p>/g) || [xml];
+          const text = paragraphs.map(paragraph => [...paragraph.matchAll(/<w:(?:t|delText|instrText)(?: [^>]*)?>([\s\S]*?)<\/w:(?:t|delText|instrText)>/g)].map(match => decodeEntities(match[1])).join('')).filter(Boolean);
+          if (text.length) return text;
+          return [...xml.matchAll(/<w:t(?: [^>]*)?>([\s\S]*?)<\/w:t>/g)].map(match => decodeEntities(match[1])).filter(Boolean);
+        }
+        pointer += 46 + nameLength + extraLength + commentLength;
+      }
+      throw new Error('No readable document text was found.');
+    };
+    const findBytes = (bytes, needle, from = 0) => {
+      outer: for (let i = from; i <= bytes.length - needle.length; i++) { for (let j = 0; j < needle.length; j++) if (bytes[i + j] !== needle[j]) continue outer; return i; } return -1;
+    };
+    const pdfString = value => value.replace(/\\([nrtbf()\\])/g, (_, char) => ({ n:'\n', r:'\r', t:'\t', b:'\b', f:'\f', '(': '(', ')': ')', '\\':'\\' }[char] || char)).replace(/\\([0-7]{1,3})/g, (_, octal) => String.fromCharCode(parseInt(octal, 8)));
+    const inflatePdfStream = async bytes => {
+      for (const type of ['deflate', 'deflate-raw']) try { return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream(type))).arrayBuffer()); } catch (_) { /* try next decoder */ }
+      throw new Error('Unsupported compressed PDF stream.');
+    };
+    const textFromPdfOperators = source => {
+      const pieces = [];
+      const arrayOps = [...source.matchAll(/\[([\s\S]*?)\]\s*TJ/g)].map(match => match[1]);
+      arrayOps.forEach(array => [...array.matchAll(/\((?:\\.|[^\\)])*\)/g)].forEach(match => pieces.push(pdfString(match[0].slice(1, -1)))));
+      [...source.matchAll(/\((?:\\.|[^\\)])*\)\s*(?:Tj|')/g)].forEach(match => pieces.push(pdfString(match[0].replace(/\s*(?:Tj|')$/, '').slice(1, -1))));
+      return pieces.join(' ').replace(/\s+/g, ' ').trim();
+    };
+    const readPdf = async file => {
+      const bytes = new Uint8Array(await file.arrayBuffer()), stream = new TextEncoder().encode('stream'), endstream = new TextEncoder().encode('endstream'), decoder = new TextDecoder('latin1');
+      const paragraphs = []; let cursor = 0;
+      while (true) {
+        const begin = findBytes(bytes, stream, cursor); if (begin < 0) break;
+        const dictionary = decoder.decode(bytes.slice(Math.max(0, begin - 700), begin)); let dataStart = begin + stream.length;
+        while (bytes[dataStart] === 10 || bytes[dataStart] === 13) dataStart++;
+        const finish = findBytes(bytes, endstream, dataStart); if (finish < 0) break;
+        let data = bytes.slice(dataStart, finish); cursor = finish + endstream.length;
+        if (/\/FlateDecode/.test(dictionary)) { try { data = await inflatePdfStream(data); } catch (_) { continue; } }
+        const text = textFromPdfOperators(decoder.decode(data)); if (text) paragraphs.push(text);
+      }
+      if (!paragraphs.length) throw new Error('No selectable text was found in this PDF. It may be a scanned image PDF.');
+      return paragraphs;
+    };
+    const ocrPdf = async (file, onProgress) => {
+      if (!window.pdfjsLib || !window.Tesseract) throw new Error('The local OCR runtime did not load. Run the app through the local preview server.');
+      const localPath = name => new URL(name, window.location.href).href;
+      onProgress?.('Loading the PDF pages locally…');
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = localPath('pdf.worker.min.js');
+      const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()), disableWorker: true }).promise;
+      const pages = Math.min(pdf.numPages, 12), output = [];
+      onProgress?.('Loading the private OCR language model…');
+      const worker = await window.Tesseract.createWorker('eng', 1, {
+        workerPath: localPath('tesseract.worker.min.js'), corePath: localPath('tesseract-core.wasm.js'), langPath: localPath(''), workerBlobURL: false,
+        logger: message => {
+          const labels = { 'loading tesseract core':'Loading OCR engine…', 'initializing tesseract':'Initializing OCR engine…', 'loading language traineddata':'Loading English recognition model…', 'initializing api':'Preparing text recognition…' };
+          if (message.status === 'recognizing text') onProgress?.(`Recognizing page ${output.length + 1} of ${pages}… ${Math.round((message.progress || 0) * 100)}%`);
+          else if (labels[message.status]) onProgress?.(labels[message.status]);
+        }
+      });
+      try {
+        for (let pageNumber = 1; pageNumber <= pages; pageNumber++) {
+          onProgress?.(`Preparing page ${pageNumber} of ${pages} for local OCR…`);
+          const page = await pdf.getPage(pageNumber), viewport = page.getViewport({ scale: 2 });
+          const canvas = document.createElement('canvas'); canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+          const result = await worker.recognize(canvas);
+          const text = result.data.text.replace(/\r/g, '').split(/\n{2,}/).map(line => line.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()).filter(Boolean);
+          output.push(...text);
+        }
+      } finally { await worker.terminate(); }
+      if (!output.length) throw new Error('OCR could not recognize text on these pages.');
+      return output;
+    };
+    const saveDrafts = () => localStorage.setItem('margin-drafts', JSON.stringify(drafts));
+    const formatSize = bytes => bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    const showOnly = view => { [writerView, editorHome, review].forEach(el => el.classList.remove('active')); view?.classList.add('active'); };
+    const renderWriterDrafts = () => {
+      const target = document.querySelector('#writerDrafts');
+      target.innerHTML = drafts.length ? drafts.map(file => `<div class="draft-card"><span class="file-symbol">${file.type}</span><span class="file-name">${escapeHTML(file.name)}</span><span class="file-meta">${file.size}</span><button data-delete="${file.uploaded}">Delete</button></div>`).join('') : '<div class="file-empty">No drafts yet. Upload your first draft to begin.</div>';
+    };
+    const renderEditorHome = () => {
+      document.querySelector('#editorDraftCount').textContent = drafts.length ? `${drafts.length} ${drafts.length === 1 ? 'writer draft is' : 'writer drafts are'} ready to review.` : 'No writer drafts have been added to this browser workspace yet.';
+      document.querySelector('#queueSummary').textContent = editingQueue.length ? `${editingQueue[0].name} is ready to open.` : 'No draft selected yet.';
+    };
+    const renderLibrary = () => {
+      const writer = role === 'writer';
+      document.querySelector('#libraryTitle').textContent = writer ? 'Your submitted drafts' : 'Writer draft library';
+      document.querySelector('#libraryHelp').textContent = writer ? 'Upload a draft to keep it in your personal workspace.' : 'Select one draft, then open it for inline editing.';
+      document.querySelector('#uploadZone').style.display = writer ? 'block' : 'none';
+      document.querySelector('#openSelected').textContent = writer ? 'Close library' : 'Open selected draft';
+      if (!drafts.length) { fileList.innerHTML = `<div class="file-empty">${writer ? 'No drafts yet — upload a PDF or DOCX to begin.' : 'No writer drafts are available yet.'}</div>`; return; }
+      fileList.innerHTML = drafts.map((file, index) => `<label class="file-row"><input type="${writer ? 'checkbox' : 'radio'}" name="editor-draft" value="${index}" ${!writer && editingQueue[0]?.uploaded === file.uploaded ? 'checked' : ''}><span class="file-symbol">${file.type}</span><span class="file-name">${escapeHTML(file.name)}</span><span class="file-meta">${file.owner} · ${file.size}</span></label>`).join('');
+    };
+    const openLibrary = () => { renderLibrary(); library.showModal(); };
+    const enterRole = nextRole => {
+      role = nextRole; roleGate.classList.add('hidden'); document.querySelector('#switchRole').classList.add('visible');
+      document.querySelector('#openLibrary').style.display = role === 'editor' ? 'block' : 'none';
+      document.querySelector('#statusText').textContent = role === 'writer' ? 'Writer workspace' : 'Editor workspace';
+      if (role === 'writer') { renderWriterDrafts(); showOnly(writerView); } else { renderEditorHome(); showOnly(editorHome); }
+    };
+    document.querySelectorAll('.role-choice').forEach(button => button.onclick = () => enterRole(button.dataset.role));
+    document.querySelector('#switchRole').onclick = () => { role = ''; roleGate.classList.remove('hidden'); document.querySelector('#switchRole').classList.remove('visible'); document.querySelector('#openLibrary').style.display = 'none'; showOnly(null); };
+    document.querySelector('#openLibrary').onclick = openLibrary;
+    document.querySelector('#writerUpload').onclick = () => upload.click();
+    document.querySelector('#writerDrafts').onclick = async event => {
+      const id = event.target.dataset.delete; if (!id) return;
+      await removeFile(id); drafts = drafts.filter(file => file.uploaded !== id); saveDrafts(); renderWriterDrafts();
+    };
+    document.querySelector('#editorBrowse').onclick = openLibrary;
+    document.querySelector('#openQueue').onclick = () => { if (editingQueue.length) openReview(editingQueue); else openLibrary(); };
+    document.querySelector('#closeLibrary').onclick = () => library.close();
+    upload.onchange = async event => {
+      for (const file of [...event.target.files].filter(file => /\.(pdf|docx)$/i.test(file.name))) {
+        const type = file.name.toLowerCase().endsWith('.pdf') ? 'PDF' : 'DOCX';
+        const uploaded = `${Date.now()}-${Math.random()}`;
+        await saveFile(uploaded, file);
+        drafts.unshift({ name:file.name, type, size:formatSize(file.size), owner:'Writer', uploaded });
+      }
+      saveDrafts(); upload.value = ''; renderWriterDrafts(); renderLibrary();
+    };
+    const openReview = async queue => {
+      const active = queue[0];
+      document.querySelector('#draftTitle').textContent = active.name.replace(/\.(pdf|docx)$/i, '');
+      document.querySelector('.byline').textContent = `${active.owner} · Opened for editorial review`;
+      document.querySelector('#statusText').textContent = 'Editing draft';
+      document.querySelector('.editor-note').textContent = 'Editor mode is on. Highlight a passage to leave a specific note, or add overall feedback at the end.';
+      article.classList.remove('file-preview'); article.innerHTML = '<div class="file-notice">Opening uploaded document…</div>';
+      library.close(); showOnly(review);
+      const file = await getFile(active.uploaded);
+      if (!file) {
+        article.innerHTML = '<div class="file-notice"><strong>This draft came from the earlier prototype.</strong><br>Its file name was saved, but not its contents. Please ask the writer to upload this draft again; new uploads retain the file content locally.</div>';
+        return;
+      }
+      if (active.type === 'PDF') {
+        try {
+          const paragraphs = await readPdf(file);
+          article.innerHTML = paragraphs.map(paragraph => `<p>${escapeHTML(paragraph)}</p>`).join('');
+          document.querySelector('.editor-note').textContent = 'PDF text is ready for editor mode. Highlight a passage to leave a specific note, or add overall feedback at the end.';
+        } catch (error) {
+          article.innerHTML = '<div class="file-notice" id="ocrStatus">No text layer found. Starting private, on-device OCR…</div>';
+          try {
+            const paragraphs = await ocrPdf(file, status => { const target = document.querySelector('#ocrStatus'); if (target) target.textContent = status; });
+            article.innerHTML = paragraphs.map(paragraph => `<p>${escapeHTML(paragraph)}</p>`).join('');
+            document.querySelector('.editor-note').textContent = 'This scanned PDF was converted to editable text locally. Highlight a passage to leave a specific note.';
+          } catch (ocrError) {
+            article.innerHTML = `<div class="file-notice">We could not recognize this scanned PDF locally: ${escapeHTML(ocrError.message)}.</div>`;
+          }
+        }
+        return;
+      }
+      try {
+        const paragraphs = await readDocx(file);
+        article.innerHTML = paragraphs.length ? paragraphs.map(paragraph => `<p>${escapeHTML(paragraph)}</p>`).join('') : '<div class="file-notice">No text was found in this DOCX file.</div>';
+      } catch (error) {
+        article.innerHTML = `<div class="file-notice">We could not read this DOCX: ${escapeHTML(error.message)}.</div>`;
+      }
+    };
+    document.querySelector('#openSelected').onclick = async () => {
+      if (role === 'writer') return library.close();
+      editingQueue = [...fileList.querySelectorAll('input:checked')].slice(0, 1).map(input => drafts[Number(input.value)]);
+      if (!editingQueue.length) return;
+      renderEditorHome(); await openReview(editingQueue);
+    };
+  </script>
+</body>
+</html>
