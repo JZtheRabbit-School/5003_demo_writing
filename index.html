@@ -17,7 +17,8 @@
     .role-options { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .role-choice { text-align:left; cursor:pointer; padding:25px; border:1px solid var(--line); background:#fffefa; transition:.18s ease; }
     .role-choice:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 20px rgba(49,38,20,.08); }
-    .role-icon { color:var(--accent); font:30px Georgia,serif; display:block; margin-bottom:15px; }
+    .role-icon { color:var(--accent); display:block; height:30px; margin-bottom:15px; }
+    .role-icon svg { width:30px; height:30px; display:block; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.7; }
     .role-choice strong { display:block; font:600 23px Georgia,serif; margin-bottom:7px; }
     .role-choice span { color:var(--muted); font-size:14px; line-height:1.45; }
     .role-privacy { margin-top:23px; color:var(--muted); font-size:12px; }
@@ -39,6 +40,10 @@
     .article { max-width:690px; font:20px/1.78 Georgia, serif; }
     .article p { margin:0 0 1.35em; }
     .article.file-preview { max-width:none; min-height:560px; }
+    .back-review { margin-bottom:26px; }
+    .writer-feedback .selection-popover { display:none !important; }
+    .writer-feedback #saveGeneral, .writer-feedback #finishEditing, .writer-feedback #savedMessage { display:none; }
+    .writer-feedback textarea { background:#f8f4ed; color:var(--ink); }
     .pdf-preview { width:100%; height:650px; border:1px solid var(--line); background:#f7f5f0; }
     .file-notice { max-width:690px; padding:20px; background:#fff3e9; border-left:3px solid var(--accent); color:#654839; font:15px/1.55 Inter, sans-serif; }
     mark.comment-highlight { color:inherit; background:linear-gradient(180deg, transparent 32%, var(--mark) 32%); cursor:pointer; padding:0 1px; border-radius:2px; }
@@ -57,6 +62,17 @@
     .reply-box { margin-top:9px; display:flex; gap:7px; }
     .reply-box input { min-width:0; width:100%; border:1px solid var(--line); border-radius:4px; padding:8px; background:#fff; font-size:12px; }
     .reply-box button, .submit, .save { border:0; cursor:pointer; border-radius:4px; background:var(--ink); color:white; padding:8px 11px; font-size:12px; font-weight:650; }
+    .private-thread { margin-top:15px; padding-top:13px; border-top:1px solid var(--line); }
+    .thread-label { color:var(--muted); font-size:10px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; margin-bottom:9px; }
+    .thread-empty { color:var(--muted); font-size:12px; line-height:1.45; }
+    .message { max-width:88%; padding:8px 10px; border-radius:10px; margin:6px 0; font-size:12px; line-height:1.42; }
+    .message.writer { margin-left:auto; background:#fce8e1; }
+    .message.editor { background:#f1eee7; }
+    .message-sender { display:block; color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; margin-bottom:3px; }
+    .private-compose { display:flex; gap:7px; margin-top:9px; }
+    .private-compose input { min-width:0; flex:1; border:1px solid var(--line); border-radius:4px; padding:8px; background:#fff; font-size:12px; }
+    .private-compose button { border:0; cursor:pointer; border-radius:4px; background:var(--ink); color:white; padding:8px 10px; font-size:12px; font-weight:650; }
+    .private-compose button:disabled { cursor:not-allowed; opacity:.45; }
     .general { margin-top:54px; padding-top:30px; border-top:1px solid var(--line); }
     .general h2 { font:500 28px Georgia, serif; margin:0 0 7px; }
     .general p { color:var(--muted); margin:0 0 15px; font-size:14px; }
@@ -81,6 +97,9 @@
     .upload-zone small { display:block; color:var(--muted); margin-top:7px; }
     .file-list { display:grid; gap:8px; max-height:300px; overflow:auto; }
     .file-row { display:flex; align-items:center; gap:12px; padding:13px; border:1px solid var(--line); background:#fff; }
+    .file-row-wrap { display:flex; align-items:center; gap:8px; }
+    .file-row-wrap .file-row { flex:1; }
+    .remove-library { border:0; background:transparent; color:var(--accent); cursor:pointer; font-size:12px; font-weight:750; padding:8px 0; white-space:nowrap; }
     .file-row input { accent-color:var(--accent); width:16px; height:16px; }
     .file-symbol { width:30px; height:35px; display:grid; place-items:center; border-radius:3px; background:#fce8e1; color:var(--accent); font-size:10px; font-weight:800; }
     .file-name { flex:1; font-size:14px; font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -97,6 +116,8 @@
     .draft-cards { display:grid; gap:9px; }
     .draft-card { display:flex; align-items:center; gap:11px; padding:13px; background:#fff; border:1px solid var(--line); }
     .draft-card button { border:0; background:transparent; color:var(--accent); font-size:12px; font-weight:750; cursor:pointer; }
+    .genre-select { width:100%; margin:0 0 12px; padding:10px 11px; border:1px solid var(--line); border-radius:4px; background:#fff; color:var(--ink); font-size:14px; }
+    .genre-tag { display:inline-block; padding:3px 7px; border-radius:999px; background:#fce8e1; color:#9b482f; font-size:10px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; white-space:nowrap; }
     .primary-action { border:0; border-radius:4px; background:var(--ink); color:white; padding:10px 14px; font-weight:700; cursor:pointer; font-size:13px; }
     #reviewWorkspace { display:none; }
     #reviewWorkspace.active { display:grid; }
@@ -106,13 +127,14 @@
 </head>
 <body>
   <section class="role-gate" id="roleGate">
-    <div class="role-panel"><div class="eyebrow">Welcome to Margin</div><h1>Start in the right seat.</h1><p>Choose your role to enter a private, local workspace for thoughtful editorial collaboration.</p><div class="role-options"><button class="role-choice" data-role="writer"><span class="role-icon">✦</span><strong>I'm a writer</strong><span>Upload a PDF or DOCX draft and receive focused editorial feedback.</span></button><button class="role-choice" data-role="editor"><span class="role-icon">⌁</span><strong>I'm an editor</strong><span>Access submitted drafts, choose one, and begin your review.</span></button></div><div class="role-privacy">Files remain in this browser workspace only. No external service is used.</div></div>
+    <div class="role-panel"><div class="eyebrow">Welcome to Margin</div><h1>Start in the right seat.</h1><p>Choose your role to enter a private, local workspace for thoughtful editorial collaboration.</p><div class="role-options"><button class="role-choice" data-role="writer"><span class="role-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.2 3.8a6 6 0 0 0-8.5 0L5 10.5V19h8.5l6.7-6.7a6 6 0 0 0 0-8.5Z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/><path d="M9 7v10"/></svg></span><strong>I'm a writer</strong><span>Upload a PDF or DOCX draft and receive focused editorial feedback.</span></button><button class="role-choice" data-role="editor"><span class="role-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5M9 12h6M9 16h6"/></svg></span><strong>I'm an editor</strong><span>Access submitted drafts, choose one, and begin your review.</span></button></div><div class="role-privacy">Files remain in this browser workspace only. No external service is used.</div></div>
   </section>
-  <header class="topbar"><div class="brand"><span class="brand-mark"></span>Margin</div><div class="bar-actions"><button class="switch-role" id="switchRole">Change role</button><button class="library-button" id="openLibrary">Draft library</button><div class="status"><span class="dot"></span><span id="statusText">Choose a role to begin</span></div></div></header>
-  <section class="role-view" id="writerView"><div class="eyebrow">Writer space</div><h1>Your drafts, in one quiet place.</h1><p class="intro">Add PDF or DOCX files, then return here any time to see the drafts you have submitted for editorial review.</p><div class="dash-grid"><div class="dash-card"><h2>My drafts</h2><div class="draft-cards" id="writerDrafts"></div></div><div class="dash-card"><h2>Submit a draft</h2><p>Upload one or more PDF or DOCX files. They are kept locally in this browser workspace.</p><button class="primary-action" id="writerUpload">Upload drafts</button></div></div></section>
-  <section class="role-view" id="editorHome"><div class="eyebrow">Editor space</div><h1>Find the next draft worth shaping.</h1><p class="intro">Browse all writer submissions, choose one draft, and open it to begin leaving inline notes.</p><div class="dash-grid"><div class="dash-card"><h2>Submission library</h2><p id="editorDraftCount">Loading available drafts…</p><button class="primary-action" id="editorBrowse">Browse draft library</button></div><div class="dash-card"><h2>Selected draft</h2><p id="queueSummary">No draft selected yet.</p><button class="library-button" id="openQueue">Open selected draft</button></div></div></section>
+  <header class="topbar"><div class="brand"><span class="brand-mark"></span>Margin</div><div class="bar-actions"><button class="switch-role" id="switchRole">Change role</button><button class="library-button" id="openLibrary">My editing library</button><div class="status"><span class="dot"></span><span id="statusText">Choose a role to begin</span></div></div></header>
+  <section class="role-view" id="writerView"><div class="eyebrow">Writer space</div><h1>Your drafts, in one quiet place.</h1><p class="intro">Classify each PDF or DOCX draft by genre before submitting it for editorial review.</p><div class="dash-grid"><div class="dash-card"><h2>My drafts</h2><div class="draft-cards" id="writerDrafts"></div></div><div class="dash-card"><h2>Submit a draft</h2><p>Choose a genre first, then upload one or more drafts in that genre.</p><select class="genre-select" id="writerGenre" aria-label="Draft genre"><option value="">Choose a genre…</option><option>Sci-fi</option><option>Fantasy</option><option>Horror</option><option>Mystery</option><option>Romance</option><option>Poetry</option><option>Literary fiction</option><option>Historical fiction</option><option>Nonfiction</option><option>Other</option></select><button class="primary-action" id="writerUpload">Upload drafts</button></div></div></section>
+  <section class="role-view" id="editorHome"><div class="eyebrow">Editor space</div><h1>Find the next draft worth shaping.</h1><p class="intro">Choose the genre you want to edit, then browse one matching draft at a time.</p><div class="dash-grid"><div class="dash-card"><h2>Submission library</h2><select class="genre-select" id="editorGenre" aria-label="Genre to edit"><option value="">Choose a genre to edit…</option><option>Sci-fi</option><option>Fantasy</option><option>Horror</option><option>Mystery</option><option>Romance</option><option>Poetry</option><option>Literary fiction</option><option>Historical fiction</option><option>Nonfiction</option><option>Other</option></select><p id="editorDraftCount">Choose a genre to see matching drafts.</p><button class="primary-action" id="editorBrowse">Browse submissions</button></div><div class="dash-card"><h2>My editing library</h2><p id="queueSummary">No drafts are open for editing yet.</p><button class="library-button" id="openQueue">Open my editing library</button></div><div class="dash-card"><h2>Completed edits</h2><p id="completedSummary">No completed edits yet.</p><button class="library-button" id="openCompleted">View completed edits</button></div></div></section>
   <main class="workspace" id="reviewWorkspace">
     <section class="document">
+      <button class="library-button back-review" id="backToDashboard">← Back to dashboard</button>
       <div class="eyebrow">Draft · Personal essay</div>
       <h1 id="draftTitle">The shape of a quiet morning</h1>
       <div class="byline">by Eliana Brooks · Submitted today</div>
@@ -124,10 +146,10 @@
         <p>Later, messages arrive and the day becomes a set of doors opening at once. But for a few minutes, the world is only a room, a window, and the soft work of beginning.</p>
       </article>
       <section class="general">
-        <h2>General feedback</h2>
-        <p>Share overall thoughts about the piece: its structure, voice, or next steps.</p>
+        <h2 id="generalTitle">General feedback</h2>
+        <p id="generalHelp">Share overall thoughts about the piece: its structure, voice, or next steps.</p>
         <textarea id="generalFeedback" placeholder="Write a general comment…"></textarea>
-        <div class="general-actions"><span class="saved" id="savedMessage">General comment saved</span><button class="save" id="saveGeneral">Save general comment</button></div>
+        <div class="general-actions"><span class="saved" id="savedMessage">General comment saved</span><button class="save" id="saveGeneral">Save general comment</button><button class="primary-action" id="finishEditing">Finish editing &amp; share feedback</button></div>
       </section>
     </section>
     <aside>
@@ -138,14 +160,17 @@
   <div class="selection-popover" id="popover"><button id="commentSelection">Add comment</button></div>
   <dialog id="commentDialog"><div class="dialog-content"><h3>Leave a note</h3><div class="selected-text" id="selectedText"></div><textarea id="commentInput" placeholder="What would you like the writer to consider?"></textarea><div class="dialog-actions"><button class="cancel" id="cancel">Cancel</button><button class="submit" id="submit">Add comment</button></div></div></dialog>
   <dialog class="library-dialog" id="libraryDialog"><div class="dialog-content"><div class="library-top"><div><h3 id="libraryTitle">Your draft library</h3><p id="libraryHelp"></p></div><button class="cancel" id="closeLibrary">Close</button></div><div class="upload-zone" id="uploadZone"><label for="fileUpload">Choose draft files</label><input id="fileUpload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden><small>PDF or DOCX · stored only in this browser workspace</small></div><div class="file-list" id="fileList"></div><div class="dialog-actions"><button class="submit" id="openSelected">Open selected drafts</button></div></div></dialog>
+  <dialog class="library-dialog" id="completedDialog"><div class="dialog-content"><div class="library-top"><div><h3 id="completedTitle">Completed edits</h3><p id="completedHelp"></p></div><button class="cancel" id="closeCompleted">Close</button></div><div class="file-list" id="completedList"></div></div></dialog>
+  <dialog id="feedbackDialog"><div class="dialog-content"><h3 id="feedbackTitle">Editorial feedback</h3><div id="feedbackContent"></div><div class="dialog-actions"><button class="submit" id="closeFeedback">Done</button></div></div></dialog>
   <script src="pdf.min.js"></script>
   <script src="tesseract.min.js"></script>
   <script>
     const article = document.querySelector('#article'), popover = document.querySelector('#popover'), dialog = document.querySelector('#commentDialog');
     const selectedText = document.querySelector('#selectedText'), input = document.querySelector('#commentInput'), comments = document.querySelector('#comments'), count = document.querySelector('#count');
-    let savedRange = null, noteNumber = 0;
+    let savedRange = null, noteNumber = 0, viewingFeedback = false;
     const escapeHTML = value => value.replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[char]));
     document.addEventListener('selectionchange', () => {
+      if (viewingFeedback) return popover.style.display = 'none';
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || !article.contains(sel.anchorNode) || !article.contains(sel.focusNode)) return popover.style.display = 'none';
       const range = sel.getRangeAt(0); if (!range.toString().trim()) return;
@@ -172,7 +197,9 @@
     const roleGate = document.querySelector('#roleGate'), library = document.querySelector('#libraryDialog');
     const fileList = document.querySelector('#fileList'), upload = document.querySelector('#fileUpload');
     const writerView = document.querySelector('#writerView'), editorHome = document.querySelector('#editorHome'), review = document.querySelector('#reviewWorkspace');
-    let role = '', editingQueue = [], drafts = JSON.parse(localStorage.getItem('margin-drafts') || '[]');
+    let role = '', editingQueue = [], libraryMode = 'writer', currentDraft = null, drafts = JSON.parse(localStorage.getItem('margin-drafts') || '[]');
+    let editorLibraryIds = JSON.parse(localStorage.getItem('margin-editor-library') || '[]');
+    let completedEdits = JSON.parse(localStorage.getItem('margin-completed-edits') || '[]');
     const sampleArticle = article.innerHTML;
     const dbName = 'margin-file-store', storeName = 'draft-files';
     const openDB = () => new Promise((resolve, reject) => {
@@ -267,26 +294,53 @@
       return output;
     };
     const saveDrafts = () => localStorage.setItem('margin-drafts', JSON.stringify(drafts));
+    const saveEditorLibrary = () => localStorage.setItem('margin-editor-library', JSON.stringify(editorLibraryIds));
+    const saveCompletedEdits = () => localStorage.setItem('margin-completed-edits', JSON.stringify(completedEdits));
     const formatSize = bytes => bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
     const showOnly = view => { [writerView, editorHome, review].forEach(el => el.classList.remove('active')); view?.classList.add('active'); };
+    const writerGenre = document.querySelector('#writerGenre'), editorGenre = document.querySelector('#editorGenre');
+    const normalizedGenre = file => file.genre || 'Other';
+    const completedEditFor = id => completedEdits.find(edit => edit.uploaded === id);
+    const editorLibrary = () => {
+      const available = new Map(drafts.map(file => [file.uploaded, file]));
+      editorLibraryIds = editorLibraryIds.filter(id => available.has(id)).slice(0, 5);
+      saveEditorLibrary();
+      return editorLibraryIds.map(id => available.get(id));
+    };
     const renderWriterDrafts = () => {
       const target = document.querySelector('#writerDrafts');
-      target.innerHTML = drafts.length ? drafts.map(file => `<div class="draft-card"><span class="file-symbol">${file.type}</span><span class="file-name">${escapeHTML(file.name)}</span><span class="file-meta">${file.size}</span><button data-delete="${file.uploaded}">Delete</button></div>`).join('') : '<div class="file-empty">No drafts yet. Upload your first draft to begin.</div>';
+      target.innerHTML = drafts.length ? drafts.map(file => {
+        const finished = completedEditFor(file.uploaded);
+        return `<div class="draft-card"><span class="file-symbol">${file.type}</span><span class="file-name">${escapeHTML(file.name)}</span><span class="genre-tag">${escapeHTML(normalizedGenre(file))}</span><span class="file-meta">${finished ? 'Edited · feedback ready' : file.size}</span>${finished ? `<button data-feedback="${file.uploaded}">Read feedback</button>` : ''}<button data-delete="${file.uploaded}">Delete</button></div>`;
+      }).join('') : '<div class="file-empty">No drafts yet. Upload your first draft to begin.</div>';
     };
     const renderEditorHome = () => {
-      document.querySelector('#editorDraftCount').textContent = drafts.length ? `${drafts.length} ${drafts.length === 1 ? 'writer draft is' : 'writer drafts are'} ready to review.` : 'No writer drafts have been added to this browser workspace yet.';
-      document.querySelector('#queueSummary').textContent = editingQueue.length ? `${editingQueue[0].name} is ready to open.` : 'No draft selected yet.';
+      const genre = editorGenre.value, matching = drafts.filter(file => normalizedGenre(file) === genre && !completedEditFor(file.uploaded));
+      document.querySelector('#editorDraftCount').textContent = !genre ? 'Choose a genre to see matching drafts.' : matching.length ? `${matching.length} ${matching.length === 1 ? 'draft is' : 'drafts are'} available in ${genre}.` : `No ${genre} drafts are available yet.`;
+      const active = editorLibrary();
+      document.querySelector('#queueSummary').textContent = active.length ? `${active.length} of 5 drafts are in your editing library.${editingQueue.length ? ` ${editingQueue[0].name} is ready to open.` : ''}` : 'No drafts are open for editing yet. You can keep up to 5 drafts here.';
+      document.querySelector('#completedSummary').textContent = completedEdits.length ? `${completedEdits.length} ${completedEdits.length === 1 ? 'draft has' : 'drafts have'} been completed and shared with writers.` : 'No completed edits yet.';
     };
     const renderLibrary = () => {
-      const writer = role === 'writer';
-      document.querySelector('#libraryTitle').textContent = writer ? 'Your submitted drafts' : 'Writer draft library';
-      document.querySelector('#libraryHelp').textContent = writer ? 'Upload a draft to keep it in your personal workspace.' : 'Select one draft, then open it for inline editing.';
+      const writer = libraryMode === 'writer', submissions = libraryMode === 'submissions';
+      const active = editorLibrary();
+      document.querySelector('#libraryTitle').textContent = writer ? 'Your submitted drafts' : submissions ? 'Writer draft library' : 'My editing library';
+      document.querySelector('#libraryHelp').textContent = writer ? 'Upload a draft to keep it in your personal workspace.' : submissions ? `Select one ${editorGenre.value} draft, then open it for inline editing. ${active.length}/5 drafts are currently in your editing library.` : `These are the drafts you have opened for editing. Keep up to five active drafts at a time (${active.length}/5).`;
       document.querySelector('#uploadZone').style.display = writer ? 'block' : 'none';
       document.querySelector('#openSelected').textContent = writer ? 'Close library' : 'Open selected draft';
-      if (!drafts.length) { fileList.innerHTML = `<div class="file-empty">${writer ? 'No drafts yet — upload a PDF or DOCX to begin.' : 'No writer drafts are available yet.'}</div>`; return; }
-      fileList.innerHTML = drafts.map((file, index) => `<label class="file-row"><input type="${writer ? 'checkbox' : 'radio'}" name="editor-draft" value="${index}" ${!writer && editingQueue[0]?.uploaded === file.uploaded ? 'checked' : ''}><span class="file-symbol">${file.type}</span><span class="file-name">${escapeHTML(file.name)}</span><span class="file-meta">${file.owner} · ${file.size}</span></label>`).join('');
+      const visibleDrafts = writer ? drafts : submissions ? drafts.filter(file => normalizedGenre(file) === editorGenre.value && !completedEditFor(file.uploaded)) : active;
+      if (!visibleDrafts.length) { fileList.innerHTML = `<div class="file-empty">${writer ? 'No drafts yet — upload a PDF or DOCX to begin.' : submissions ? `No ${editorGenre.value} drafts are available yet.` : 'No drafts in your editing library yet. Browse submissions to open your first one.'}</div>`; return; }
+      fileList.innerHTML = visibleDrafts.map(file => {
+        const isSelected = editingQueue[0]?.uploaded === file.uploaded;
+        const row = `<label class="file-row"><input type="${writer ? 'checkbox' : 'radio'}" name="editor-draft" value="${drafts.indexOf(file)}" ${!writer && isSelected ? 'checked' : ''}><span class="file-symbol">${file.type}</span><span class="file-name">${escapeHTML(file.name)}</span><span class="genre-tag">${escapeHTML(normalizedGenre(file))}</span><span class="file-meta">${file.owner} · ${file.size}</span></label>`;
+        return libraryMode === 'editor-library' ? `<div class="file-row-wrap">${row}<button class="remove-library" data-remove-library="${file.uploaded}">Remove</button></div>` : row;
+      }).join('');
     };
-    const openLibrary = () => { renderLibrary(); library.showModal(); };
+    const openLibrary = (mode = role === 'writer' ? 'writer' : 'editor-library') => {
+      if (mode === 'submissions' && !editorGenre.value) { document.querySelector('#editorDraftCount').textContent = 'Choose a genre before browsing submissions.'; return; }
+      libraryMode = mode;
+      renderLibrary(); library.showModal();
+    };
     const enterRole = nextRole => {
       role = nextRole; roleGate.classList.add('hidden'); document.querySelector('#switchRole').classList.add('visible');
       document.querySelector('#openLibrary').style.display = role === 'editor' ? 'block' : 'none';
@@ -295,26 +349,89 @@
     };
     document.querySelectorAll('.role-choice').forEach(button => button.onclick = () => enterRole(button.dataset.role));
     document.querySelector('#switchRole').onclick = () => { role = ''; roleGate.classList.remove('hidden'); document.querySelector('#switchRole').classList.remove('visible'); document.querySelector('#openLibrary').style.display = 'none'; showOnly(null); };
-    document.querySelector('#openLibrary').onclick = openLibrary;
-    document.querySelector('#writerUpload').onclick = () => upload.click();
-    document.querySelector('#writerDrafts').onclick = async event => {
-      const id = event.target.dataset.delete; if (!id) return;
-      await removeFile(id); drafts = drafts.filter(file => file.uploaded !== id); saveDrafts(); renderWriterDrafts();
+    document.querySelector('#openLibrary').onclick = () => openLibrary('editor-library');
+    document.querySelector('#writerUpload').onclick = () => {
+      if (!writerGenre.value) { writerGenre.focus(); return; }
+      upload.click();
     };
-    document.querySelector('#editorBrowse').onclick = openLibrary;
-    document.querySelector('#openQueue').onclick = () => { if (editingQueue.length) openReview(editingQueue); else openLibrary(); };
+    const feedbackDialog = document.querySelector('#feedbackDialog');
+    const canSendPrivateMessage = (note, sender) => {
+      const messages = note.messages || [], writerHasMessaged = messages.some(message => message.sender === 'writer');
+      const editorHasReplied = messages.some(message => message.sender === 'editor');
+      return sender === 'writer' ? !writerHasMessaged || editorHasReplied : writerHasMessaged;
+    };
+    const privateThreadHTML = (edit, note, noteIndex, sender) => {
+      const messages = note.messages || [], allowed = canSendPrivateMessage(note, sender);
+      const empty = sender === 'editor' && !messages.length ? 'Waiting for the writer’s first private reply.' : sender === 'writer' && messages.length ? 'The editor has not replied yet. You can send one message now.' : 'Start a private conversation about this note.';
+      const lockText = sender === 'writer' ? 'Wait for the editor to reply before sending another message.' : 'Reply after the writer sends a message.';
+      return `<div class="private-thread"><div class="thread-label">Private messages</div>${messages.length ? messages.map(message => `<div class="message ${message.sender}"><span class="message-sender">${message.sender}</span>${escapeHTML(message.text)}</div>`).join('') : `<div class="thread-empty">${empty}</div>`}<div class="private-compose"><input data-private-input aria-label="Private message" placeholder="${allowed ? 'Write a private message…' : lockText}" ${allowed ? '' : 'disabled'}><button data-send-private data-edit="${edit.uploaded}" data-note="${noteIndex}" data-sender="${sender}" ${allowed ? '' : 'disabled'}>Send</button></div></div>`;
+    };
+    const renderEditorFeedback = edit => {
+      document.querySelector('#feedbackTitle').textContent = `Editorial feedback · ${edit.name.replace(/\.(pdf|docx)$/i, '')}`;
+      const notes = edit.notes?.length ? edit.notes.map((note, index) => `<div class="comment-card"><div class="quote">“${escapeHTML(note.quote)}”</div><div class="comment-text">${escapeHTML(note.text)}</div>${privateThreadHTML(edit, note, index, 'editor')}</div>`).join('') : '<div class="file-empty">No inline notes were left.</div>';
+      document.querySelector('#feedbackContent').innerHTML = `<div class="editor-note"><strong>General feedback</strong><br>${edit.general ? escapeHTML(edit.general).replace(/\n/g, '<br>') : 'No general feedback was added.'}</div><h3>Inline notes</h3>${notes}`;
+    };
+    const showFeedback = edit => {
+      if (role === 'writer') return openWriterFeedback(edit);
+      renderEditorFeedback(edit);
+      feedbackDialog.showModal();
+    };
+    document.querySelector('#closeFeedback').onclick = () => feedbackDialog.close();
+    const sendPrivateMessage = (event, sender) => {
+      const button = event.target.closest('[data-send-private]'); if (!button || button.dataset.sender !== sender) return;
+      const edit = completedEditFor(button.dataset.edit), note = edit?.notes?.[Number(button.dataset.note)];
+      const input = button.parentElement.querySelector('[data-private-input]'), text = input.value.trim();
+      if (!note || !text || !canSendPrivateMessage(note, sender)) return;
+      (note.messages ||= []).push({ sender, text, sentAt:new Date().toISOString() }); saveCompletedEdits();
+      if (sender === 'writer') renderFeedbackNotes(edit); else renderEditorFeedback(edit);
+    };
+    document.querySelector('#feedbackContent').onclick = event => sendPrivateMessage(event, 'editor');
+    comments.onclick = event => sendPrivateMessage(event, 'writer');
+    document.querySelector('#writerDrafts').onclick = async event => {
+      const feedbackId = event.target.dataset.feedback;
+      if (feedbackId) return showFeedback(completedEditFor(feedbackId));
+      const id = event.target.dataset.delete; if (!id) return;
+      await removeFile(id); drafts = drafts.filter(file => file.uploaded !== id); completedEdits = completedEdits.filter(edit => edit.uploaded !== id); editorLibraryIds = editorLibraryIds.filter(item => item !== id); saveDrafts(); saveCompletedEdits(); saveEditorLibrary(); renderWriterDrafts();
+    };
+    document.querySelector('#editorBrowse').onclick = () => openLibrary('submissions');
+    editorGenre.onchange = () => { editingQueue = []; renderEditorHome(); };
+    document.querySelector('#openQueue').onclick = () => openLibrary('editor-library');
     document.querySelector('#closeLibrary').onclick = () => library.close();
+    const completedDialog = document.querySelector('#completedDialog'), completedList = document.querySelector('#completedList');
+    const renderCompletedEdits = () => {
+      const groups = completedEdits.reduce((all, edit) => { const genre = normalizedGenre(edit); (all[genre] ||= []).push(edit); return all; }, {});
+      completedList.innerHTML = completedEdits.length ? Object.entries(groups).map(([genre, edits]) => `<div><div class="eyebrow" style="margin:18px 0 8px">${escapeHTML(genre)}</div>${edits.map(edit => `<button class="file-row" data-completed="${edit.uploaded}" style="width:100%; text-align:left; cursor:pointer"><span class="file-symbol">${edit.type}</span><span class="file-name">${escapeHTML(edit.name)}</span><span class="file-meta">Completed · view feedback</span></button>`).join('')}</div>`).join('') : '<div class="file-empty">No completed edits yet.</div>';
+    };
+    document.querySelector('#openCompleted').onclick = () => { renderCompletedEdits(); completedDialog.showModal(); };
+    document.querySelector('#closeCompleted').onclick = () => completedDialog.close();
+    completedList.onclick = event => { const item = event.target.closest('[data-completed]'); if (item) { completedDialog.close(); showFeedback(completedEditFor(item.dataset.completed)); } };
+    fileList.onclick = event => {
+      const id = event.target.dataset.removeLibrary; if (!id) return;
+      editorLibraryIds = editorLibraryIds.filter(item => item !== id); saveEditorLibrary();
+      if (editingQueue[0]?.uploaded === id) editingQueue = [];
+      renderLibrary(); renderEditorHome();
+    };
     upload.onchange = async event => {
       for (const file of [...event.target.files].filter(file => /\.(pdf|docx)$/i.test(file.name))) {
         const type = file.name.toLowerCase().endsWith('.pdf') ? 'PDF' : 'DOCX';
         const uploaded = `${Date.now()}-${Math.random()}`;
         await saveFile(uploaded, file);
-        drafts.unshift({ name:file.name, type, size:formatSize(file.size), owner:'Writer', uploaded });
+        drafts.unshift({ name:file.name, type, size:formatSize(file.size), owner:'Writer', genre:writerGenre.value, uploaded });
       }
       saveDrafts(); upload.value = ''; renderWriterDrafts(); renderLibrary();
     };
     const openReview = async queue => {
       const active = queue[0];
+      currentDraft = active;
+      viewingFeedback = false;
+      review.classList.remove('writer-feedback');
+      document.querySelector('#generalFeedback').disabled = false;
+      document.querySelector('#generalTitle').textContent = 'General feedback';
+      document.querySelector('#generalHelp').textContent = 'Share overall thoughts about the piece: its structure, voice, or next steps.';
+      noteNumber = 0;
+      comments.innerHTML = '<div class="empty" id="empty">Select a passage in the draft to start the conversation.</div>';
+      count.textContent = '0 notes';
+      document.querySelector('#generalFeedback').value = '';
       document.querySelector('#draftTitle').textContent = active.name.replace(/\.(pdf|docx)$/i, '');
       document.querySelector('.byline').textContent = `${active.owner} · Opened for editorial review`;
       document.querySelector('#statusText').textContent = 'Editing draft';
@@ -350,10 +467,97 @@
         article.innerHTML = `<div class="file-notice">We could not read this DOCX: ${escapeHTML(error.message)}.</div>`;
       }
     };
+    const renderFeedbackNotes = edit => {
+      const notes = edit.notes || [];
+      const existingMarkers = [...article.querySelectorAll('mark.comment-highlight')];
+      existingMarkers.forEach(marker => delete marker.dataset.feedbackLinked);
+      noteNumber = notes.length;
+      comments.innerHTML = notes.length ? '' : '<div class="empty">No inline notes were left for this draft.</div>';
+      notes.forEach((note, index) => {
+        const card = document.createElement('div'); card.className = 'comment-card'; card.dataset.card = index + 1;
+        card.innerHTML = `<div class="quote">“${escapeHTML(note.quote)}”</div><div class="comment-meta">Editor feedback</div><div class="comment-text">${escapeHTML(note.text)}</div>${privateThreadHTML(edit, note, index, 'writer')}`;
+        comments.append(card);
+        const existingMarker = existingMarkers.find(marker => !marker.dataset.feedbackLinked && marker.textContent.trim() === note.quote);
+        if (existingMarker) {
+          existingMarker.dataset.feedbackLinked = 'true';
+          existingMarker.dataset.note = index + 1;
+          existingMarker.onclick = () => { document.querySelectorAll('mark').forEach(item => item.classList.remove('active')); existingMarker.classList.add('active'); card.scrollIntoView({ behavior:'smooth', block:'center' }); };
+          return;
+        }
+        if (!note.quote) return;
+        const walker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT); let textNode, match;
+        while ((textNode = walker.nextNode())) { const at = textNode.nodeValue.indexOf(note.quote); if (at >= 0) { match = { textNode, at }; break; } }
+        if (!match) return;
+        const range = document.createRange(); range.setStart(match.textNode, match.at); range.setEnd(match.textNode, match.at + note.quote.length);
+        const marker = document.createElement('mark'); marker.className = 'comment-highlight'; marker.dataset.note = index + 1;
+        range.surroundContents(marker);
+        marker.onclick = () => { document.querySelectorAll('mark').forEach(item => item.classList.remove('active')); marker.classList.add('active'); card.scrollIntoView({ behavior:'smooth', block:'center' }); };
+      });
+      count.textContent = `${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`;
+    };
+    const openWriterFeedback = async edit => {
+      viewingFeedback = true; currentDraft = null; editingQueue = [];
+      review.classList.add('writer-feedback');
+      document.querySelector('#draftTitle').textContent = edit.name.replace(/\.(pdf|docx)$/i, '');
+      document.querySelector('.byline').textContent = 'Your draft · editorial feedback is ready';
+      document.querySelector('.editor-note').textContent = 'Read the editor’s notes alongside your draft. Highlighted passages are linked to the notes in the right panel.';
+      document.querySelector('#generalTitle').textContent = 'Editorial feedback';
+      document.querySelector('#generalHelp').textContent = 'The editor’s overall feedback on this draft.';
+      const general = document.querySelector('#generalFeedback'); general.value = edit.general || 'No general feedback was added.'; general.disabled = true;
+      article.classList.remove('file-preview'); article.innerHTML = '<div class="file-notice">Opening your draft with editorial feedback…</div>';
+      showOnly(review);
+      if (edit.reviewHtml) {
+        article.innerHTML = edit.reviewHtml;
+        renderFeedbackNotes(edit);
+        return;
+      }
+      renderFeedbackNotes(edit);
+      const file = await getFile(edit.uploaded);
+      try {
+        let paragraphs;
+        if (!file) throw new Error('The original file is no longer stored in this browser.');
+        if (edit.type === 'PDF') {
+          try { paragraphs = await readPdf(file); }
+          catch (_) { paragraphs = await ocrPdf(file); }
+        } else paragraphs = await readDocx(file);
+        article.innerHTML = paragraphs.length ? paragraphs.map(paragraph => `<p>${escapeHTML(paragraph)}</p>`).join('') : '<div class="file-notice">No readable text was found in this draft.</div>';
+      } catch (error) {
+        article.innerHTML = `<div class="file-notice">We could not reopen this draft: ${escapeHTML(error.message)}</div>`;
+      }
+      renderFeedbackNotes(edit);
+    };
+    document.querySelector('#backToDashboard').onclick = () => {
+      viewingFeedback = false; review.classList.remove('writer-feedback'); document.querySelector('#generalFeedback').disabled = false;
+      if (role === 'writer') { renderWriterDrafts(); showOnly(writerView); }
+      else { renderEditorHome(); showOnly(editorHome); }
+    };
+    document.querySelector('#finishEditing').onclick = () => {
+      if (!currentDraft) return;
+      const notes = [...comments.querySelectorAll('.comment-card')].map(card => ({
+        quote: card.querySelector('.quote')?.textContent.replace(/[“”]/g, '').trim() || '',
+        text: card.querySelector('.comment-text')?.textContent.trim() || ''
+      })).filter(note => note.text);
+      completedEdits = completedEdits.filter(edit => edit.uploaded !== currentDraft.uploaded);
+      completedEdits.unshift({ ...currentDraft, general: document.querySelector('#generalFeedback').value.trim(), notes, reviewHtml: article.innerHTML, completedAt: new Date().toISOString() });
+      editorLibraryIds = editorLibraryIds.filter(id => id !== currentDraft.uploaded);
+      editingQueue = []; currentDraft = null;
+      saveCompletedEdits(); saveEditorLibrary(); renderEditorHome(); renderWriterDrafts();
+      document.querySelector('#statusText').textContent = 'Editor workspace';
+      showOnly(editorHome);
+    };
     document.querySelector('#openSelected').onclick = async () => {
       if (role === 'writer') return library.close();
       editingQueue = [...fileList.querySelectorAll('input:checked')].slice(0, 1).map(input => drafts[Number(input.value)]);
       if (!editingQueue.length) return;
+      const selected = editingQueue[0];
+      if (libraryMode === 'submissions' && !editorLibraryIds.includes(selected.uploaded)) {
+        if (editorLibrary().length >= 5) {
+          document.querySelector('#libraryHelp').textContent = 'Your editing library is full (5/5). Remove a draft from it before opening another submission.';
+          editingQueue = [];
+          return;
+        }
+        editorLibraryIds.unshift(selected.uploaded); saveEditorLibrary();
+      }
       renderEditorHome(); await openReview(editingQueue);
     };
   </script>

@@ -1,26 +1,87 @@
-# Margin editorial workspace
+# Margin — writer and editor workspace
 
-An interactive, self-contained review surface for editors and writers. On entry, users choose a role:
+Margin is a small, local-first browser app for reviewing drafts. It gives writers a place to add their work and editors a focused surface for opening one draft at a time, highlighting passages, leaving inline notes, replying to comments, and adding overall feedback.
 
-- Writers land in a dedicated **Writer space**, where they can add and see their own `.pdf` or `.docx` drafts.
-- Editors land in a separate **Editor space**, where they can browse every submitted draft, select one draft at a time, and open it for editing.
-- A **Change role** control always returns users to the initial role chooser.
-- Editors can select text to attach inline comments, reply within the comment rail, and leave general feedback at the end of the draft.
+This is a prototype built as a single-page application. It uses no accounts, database server, or third-party API while running.
 
-For privacy, draft files are retained only in the browser's local IndexedDB store; they are never uploaded or sent to an external service. DOCX and text-based PDF files are read into the editorial canvas for inline highlighted comments. Image-only/scanned PDFs are rendered and recognized through a bundled, on-device Tesseract OCR runtime; the result is also placed in the editorial canvas for comments. Writers can delete their own drafts from the Writer space.
+## What it can do
 
-The OCR runtime is bundled in the local `tesseract*`, `eng.traineddata.gz`, and `pdf*` files. Keep these next to `index.html`; no network is used while the app runs.
+### Writer space
 
-Draft entries added by the older prototype stored names only. Upload those files once more to make their document contents available to editors.
+- Upload `.docx` and `.pdf` drafts.
+- Choose a genre for each upload, including sci-fi, fantasy, horror, mystery, romance, poetry, and more.
+- See drafts added in the current browser workspace.
+- Delete drafts you no longer want to keep locally.
+- See when a draft has been edited and open the editor's shared general feedback and inline notes alongside the reviewed draft text, saved when the editor completes the review.
+
+### Editor space
+
+- Choose a genre, browse only writer submissions in that category, and open one draft.
+- Highlight a passage and attach an inline editorial comment.
+- Reply to an existing comment.
+- Add general feedback at the end of the draft.
+- Keep up to five drafts in a personal active editing library.
+- Finish an edit to share its notes with the writer and move it into a completed-edits library, grouped by genre.
+- Reply privately to a writer’s question on an inline note after the writer has sent their first message.
+
+### Document handling and privacy
+
+- Draft files are stored only in the browser’s IndexedDB storage on the current computer.
+- DOCX files are parsed into editable paragraph text.
+- Text-based PDFs are parsed into editable text.
+- Image-only/scanned PDFs use the included local PDF and Tesseract OCR assets to attempt text recognition before opening the result for annotation.
+- Files are not uploaded to a server or sent to an external OCR service.
+
+## Requirements
+
+- A modern Chromium-based browser.
+- A local HTTP server. This is required for the OCR worker used by scanned PDFs.
+- Either Python 3 or Node.js to start that server. No package installation or build step is needed.
 
 ## Run locally
 
-From this directory, start a static server. This is required for local scanned-PDF OCR because browser workers cannot run from a `file://` page.
+Open a terminal in this project folder and use one of the following options.
+
+### Option 1: Python
 
 ```powershell
 python -m http.server 8000
 ```
 
-Then open `http://localhost:8000` in a browser. No packages, build step, or external services are required.
+### Option 2: Node.js
 
-Do not open `index.html` by double-clicking it when using OCR: `file://` pages have a `null` origin and browsers block the OCR worker for security.
+```powershell
+node -e "require('http').createServer((req,res)=>require('fs').readFile(req.url==='/'?'index.html':req.url.slice(1),(err,data)=>{res.writeHead(err?404:200);res.end(err?'Not found':data)})).listen(8000)"
+```
+
+Then visit [http://localhost:8000](http://localhost:8000).
+
+Do not open `index.html` by double-clicking it when using OCR. A `file://` page has a `null` origin, and browsers block the OCR worker for security.
+
+## How to use it
+
+1. Choose **I’m a writer** or **I’m an editor** on the welcome screen.
+2. As a writer, choose a genre, select **Upload drafts**, then choose one or more PDF or DOCX files.
+3. Use **Change role** to return to the welcome screen.
+4. As an editor, choose the genre you want to edit, choose **Browse submissions**, then select and open one matching draft. Opening it adds it to **My editing library**; at most five drafts can be active at once.
+5. Select text in the document, choose **Add comment**, write the note, and save it.
+6. Add broader feedback in the **General feedback** area at the bottom, then select **Finish editing & share feedback**. The draft leaves the active editing library, appears in **Completed edits** grouped by genre, and the writer can select **Read feedback** beside their draft. Their draft opens in a read-only review view, with editor notes linked to the relevant passages.
+7. Under an inline note, the writer may send one private message. After the editor replies from **Completed edits**, the private thread becomes an ongoing conversation for both roles.
+
+## OCR notes
+
+The included OCR language model is English. Recognition quality depends on the scan’s resolution, contrast, orientation, and handwriting quality. OCR can take noticeably longer than opening a DOCX or a text-based PDF, especially for multi-page files.
+
+Keep `pdf.min.js`, `pdf.worker.min.js`, `tesseract.min.js`, `tesseract.worker.min.js`, `tesseract-core.wasm.js`, `tesseract-core.wasm`, and `eng.traineddata.gz` beside `index.html`; they are required for local scanned-PDF OCR.
+
+## Project files
+
+- `index.html` — app interface, styles, and client-side logic.
+- `AGENT.md` — collaboration and end-of-session guidance.
+- `SESSION_JOURNAL.md` — running record of what was learned, changed, and planned.
+
+## Development notes
+
+- The app is designed to run locally, so each browser profile has its own drafts.
+- Existing drafts from the early metadata-only prototype must be uploaded again to make their file contents available.
+- Before sharing changes, check `git status`, commit intended work, and push when ready.
